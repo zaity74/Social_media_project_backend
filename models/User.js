@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const Joi = require("joi");
-const bcrypt = require("bcrypt");
+import mongoose from "mongoose";
+import Joi from "joi";
+import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minlength: 3, maxlength: 30 },
@@ -32,4 +32,4 @@ function validateUser(user) {
 }
 
 const User = mongoose.model("User", userSchema);
-module.exports = { User, validateUser };
+export { User, validateUser }

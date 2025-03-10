@@ -1,11 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
 import dataBaseConnect from "./database/DatabaseConnect.js";
+import createUserTest from "./data/UserTest.js";
+
 
 const app = express();
 
 dotenv.config();
 dataBaseConnect()
+createUserTest()
 
 const port = process.env.PORT;
 console.log(port);
