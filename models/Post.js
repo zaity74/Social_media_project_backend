@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-const Joi = require("joi");
-
+import mongoose from "mongoose";
+import Joi from "joi";
 const postSchema = new mongoose.Schema({
     content: { type: String, required: true, maxlength: 280 },
     image: { type: String, default: "" },
@@ -20,4 +19,4 @@ function validatePost(post) {
 }
 
 const Post = mongoose.model("Post", postSchema);
-module.exports = { Post, validatePost };
+export { Post, validatePost };

@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-const Joi = require("joi");
-
+import mongoose from "mongoose";
+import Joi from "joi";
 const commentSchema = new mongoose.Schema({
     content: { type: String, required: true, maxlength: 280 },
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -15,4 +14,4 @@ function validateComment(comment) {
 }
 
 const Comment = mongoose.model("Comment", commentSchema);
-module.exports = { Comment, validateComment };
+export { Comment, validateComment };
