@@ -24,27 +24,36 @@ export const createUser = async (req, res) => {
         });
     }
 };
+
 export const updateUser = async (req, res) => {
     try {
 
         const { error, value } = validateUser(req.body);
 
-        if (error != undefined) {
+        if (error !== undefined) {
             return res.status(400).json({ message: error.details[0].message });
         }
 
-        const newUser = new User(req.body);
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+                "username": req.body.username,
+                "email": req.body.email,
+                "password": req.body.password,
+                "bio": req.body.bio,
+                "avatar": req.body.avatar,
+            },
+            { new : true });
 
-        // if (req.body.image && newUser) {
-        //     newUser.images = [req.body.image];
-        // }
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
 
-        const confirmation = await newUser.save();
-        res.status(201).json(confirmation);
+        res.status(200).json(updatedUser);
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            message: "Une erreur est survenue lors de la sauvegarde",
+            message: "Une erreur est survenue lors de la maj",
         });
     }
 };
