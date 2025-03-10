@@ -1,37 +1,35 @@
-import mongoose from "mongoose";
-import Joi from "joi";
+const mongoose = require("mongoose");
+const Joi = require("joi");
+const bcrypt = require("bcrypt");
 
-const userSchema = mongoose.Schema({
-    username: String,
-    password: String,
-    email: String,
-    country: String,
-    inscriptionDate: String,
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true, minlength: 3, maxlength: 30 },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true, minlength: 6 },
+    bio: { type: String, maxlength: 160 },
+    avatar: { type: String, default: "default-avatar.png" },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+}, { timestamps: true });
 
-
+// Hash password before saving
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
 });
+
+// Joi validation
+function validateUser(user) {
+    const schema = Joi.object({
+        username: Joi.string().min(3).max(30).required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).required(),
+        bio: Joi.string().max(160),
+        avatar: Joi.string().optional(),
+    });
+    return schema.validate(user);
+}
 
 const User = mongoose.model("User", userSchema);
-
-/**
- * Schema de validation pour le produit
- */
-const userValidation = Joi.object({
-    username: Joi.string().required().messages({
-        "string.empty": " est obligatoire",
-    }),
-    password: Joi.string().required().messages({
-        "string.empty": "La description est obligatoire",
-    }),
-    email: Joi.string().required().messages({
-        "string.empty": "La description est obligatoire",
-    }),
-    country: Joi.string().optional().allow(null, ""),
-    inscriptionDate: Joi.string().required().messages({
-        "string.empty": "La description est obligatoire",
-    }),
-});
-
-export { User, userValidation };
-export default User;
-
+module.exports = { User, validateUser };
