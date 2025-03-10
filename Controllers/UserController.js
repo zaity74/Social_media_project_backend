@@ -5,7 +5,7 @@ export const createUser = async (req, res) => {
 
         const { error, value } = validateUser(req.body);
 
-        if (error != undefined) {
+        if (error !== undefined) {
             return res.status(400).json({ message: error.details[0].message });
         }
 
@@ -54,6 +54,25 @@ export const updateUser = async (req, res) => {
         console.error(error);
         res.status(500).json({
             message: "Une erreur est survenue lors de la maj",
+        });
+    }
+};
+
+export const deleteUser = async (req, res) => {
+    try {
+
+        const deletedUser = await User.findById(req.params.id);
+
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User non trouvé" });
+        }
+
+        await deletedUser.deleteOne();
+        res.status(204).end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Une erreur est survenue lors de la suppression",
         });
     }
 };
