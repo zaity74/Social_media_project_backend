@@ -12,21 +12,19 @@ const userSchema = new mongoose.Schema({
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 }, { timestamps: true });
 
-// Hash password before saving
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-// Joi validation
 function validateUser(user) {
     const schema = Joi.object({
         username: Joi.string().min(3).max(30).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         bio: Joi.string().max(160),
-        avatar: Joi.string().optional(),
+        avatar: Joi.string().empty("default-avatar.png"),
     });
     return schema.validate(user);
 }

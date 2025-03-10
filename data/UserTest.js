@@ -10,7 +10,6 @@ const createUserTest = async () => {
                 password: 'password',
                 bio: 'bio de test',
                 avatar: 'default-avatar.png',
-                inscriptionDate: '10/23/2024'
             });
             await defaultUser.save();
             console.log('User par défaut créé');
