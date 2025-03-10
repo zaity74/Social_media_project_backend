@@ -1,9 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
+import dataBaseConnect from "./database/DatabaseConnect.js";
 
 const app = express();
 
 dotenv.config();
+dataBaseConnect()
+
 const port = process.env.PORT;
 console.log(port);
 app.use(express.json());
