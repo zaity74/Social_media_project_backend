@@ -1,5 +1,5 @@
 import express from "express";
-import {createUser, deleteUser, getUsers, updateUser} from "../Controllers/UserController.js"
+import {createUser, deleteUser, followUser, getUsers, updateUser} from "../Controllers/UserController.js"
 import { register, login } from "../Controllers/authController.js";
 import {
     addLikeToPost,
@@ -19,6 +19,7 @@ router.get("/user", getUsers);
 router.post("/user", createUser);
 router.put("/user/:id", updateUser);
 router.delete("/user/:id", deleteUser);
+router.put("/user/follow/:id", followUser);
 
 router.get("/post", getPosts);
 router.post("/post", createPost);
