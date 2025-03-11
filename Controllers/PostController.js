@@ -1,4 +1,5 @@
 import { Post, validatePost } from "../models/Post.js";
+import { User } from "../models/User.js";
 
 /**
  
@@ -18,16 +19,36 @@ export const getPosts = async (req, res) => {
 
 export const createPost = async (req, res) => {
     try {
-        // Création du post
+        const user = await User.findOne({ username: req.body.author });
+        if (!user) {
+            return res.status(400).json({ error: "Auteur non trouvé" });
+        }
+
         const newPost = new Post({
             content: req.body.content,
             image: req.body.image || "",
-            author: req.user._id
+            author: user._id,
         });
 
         await newPost.save();
-        res.status(201).json(post);
+        res.status(201).json(newPost);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: "Erreur lors de la création du post" });
+    }
+}
+
+export const deletePost = async (req, res) => {
+    try {
+        const deletedPost = await Post.findByIdAndDelete(req.params.id)
+        if(!deletedPost){
+            return res.status(404).json({ message: "Post/Tweet non trouvé" });
+        }
+
+        res.status(204).end()
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({message: "Une erreur est survenue lors de la sauvegarde"})
     }
 }
