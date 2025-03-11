@@ -1,5 +1,5 @@
 import { Post, validatePost } from "../models/Post.js";
-import { User } from "../models/User.js";
+import {User, validateUser} from "../models/User.js";
 
 /**
  
@@ -52,3 +52,33 @@ export const deletePost = async (req, res) => {
         res.status(500).json({message: "Une erreur est survenue lors de la sauvegarde"})
     }
 }
+
+export const updatePost = async (req, res) => {
+    try {
+
+        const { error, value } = validatePost(req.body);
+
+        if (error !== undefined) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+
+        const updatedPost = await Post.findByIdAndUpdate(
+            req.params.id,
+            {
+                "content": req.body.content,
+                "image": req.body.image || ""
+            },
+            { new : true });
+
+        if (!updatedPost) {
+            return res.status(404).json({ message: "Post non trouvé" });
+        }
+
+        res.status(200).json(updatedPost);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Une erreur est survenue lors de la maj",
+        });
+    }
+};

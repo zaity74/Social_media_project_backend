@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Joi from "joi";
+import {ObjectId} from "bson";
 
 const postSchema = new mongoose.Schema({
     content: { type: String, required: true, maxlength: 280 },
@@ -14,6 +15,13 @@ const postSchema = new mongoose.Schema({
 function validatePost(post) {
     const schema = Joi.object({
         content: Joi.string().max(280).required(),
+        author: Joi.string().custom((value, helpers) => {
+            if (ObjectId.isValid(value)) {
+                return value;
+            } else {
+                return helpers.error('any.invalid');
+            }
+        }).required(),
         image: Joi.string().optional(),
     });
     return schema.validate(post);
