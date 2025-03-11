@@ -89,3 +89,31 @@ export const updatePost = async (req, res) => {
         });
     }
 };
+
+export const addLikeToPost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.body.userId;
+
+        if (!mongoose.Types.ObjectId.isValid(postId) || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ error: "ID invalide" });
+        }
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ error: "Post non trouvé" });
+        }
+
+        if (post.likes.includes(userId)) {
+            return res.status(400).json({ error: "Vous avez déjà aimé ce post" });
+        }
+
+        post.likes.push(userId);
+        await post.save();
+
+        res.status(200).json(post);
+    } catch (err) {
+        console.error("Error adding like to post:", err);
+        res.status(500).json({ error: "Erreur lors de l'ajout du like au post" });
+    }
+};
