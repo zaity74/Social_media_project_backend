@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minlength: 3, maxlength: 30 },
-    email: { type: String, required: true, unique: true, lowercase: true },
+    email: { type: String, required: true, unique: true, lowercase: true, match: /.+\@.+\..+/ },
     password: { type: String, required: true, minlength: 6 },
     bio: { type: String, maxlength: 160 },
     avatar: { type: String, default: "default-avatar.png" },
@@ -17,6 +17,11 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
+
+// Méthode pour comparer les mots de passe
+userSchema.methods.comparePassword = function (password) {
+    return bcrypt.compare(password, this.password);
+};
 
 function validateUser(user) {
     const schema = Joi.object({

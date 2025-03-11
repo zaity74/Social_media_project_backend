@@ -1,8 +1,13 @@
 import express from "express";
 import {createUser, deleteUser, updateUser} from "../Controllers/UserController.js"
 import { createPost, deletePost } from "../Controllers/PostController.js";
+import { register, login } from "../Controllers/authController.js";
+
 
 const router = express.Router();
+
+router.post("/register", register);
+router.post("/login", login);
 
 router.post("/user", createUser);
 router.put("/user/:id", updateUser);

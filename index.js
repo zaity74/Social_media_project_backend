@@ -6,7 +6,6 @@ import createPostTest from "./data/PostTest.js";
 import routes from "./routing/UserRouting.js";
 import cors from "cors";
 
-
 const app = express();
 
 dotenv.config();
