@@ -1,5 +1,5 @@
 import express from "express";
-import {createUser, deleteUser, getUsers, updateUser} from "../Controllers/UserController.js"
+import {createUser, deleteUser, getPrediction, getUsers, updateUser} from "../Controllers/UserController.js"
 import { register, login } from "../Controllers/authController.js";
 import {
     addLikeToPost,
@@ -9,8 +9,10 @@ import {
     removeLikeToPost,
     updatePost
 } from "../Controllers/PostController.js";
+import multer from "multer";
 
 const router = express.Router();
+const upload = multer();
 
 router.post("/register", register);
 router.post("/login", login);
@@ -26,6 +28,8 @@ router.delete("/post/:id", deletePost);
 router.put("/post/:id", updatePost);
 router.put("/post/like/:id", addLikeToPost);
 router.put("/post/unlike/:id", removeLikeToPost);
+
+router.post("/predict", upload.single('image'), getPrediction)
 
 
 /**

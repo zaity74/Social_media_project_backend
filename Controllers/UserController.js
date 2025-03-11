@@ -1,4 +1,8 @@
 import {User, validateUser} from "../models/User.js";
+import FormData from "form-data";
+import axios from "axios";
+import https from "https";
+import fs from "fs";
 
 export const getUsers = async (req, res) => {
     try {
@@ -86,3 +90,31 @@ export const deleteUser = async (req, res) => {
         });
     }
 };
+
+export const getPrediction = async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image provided' });
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append('image', req.file.buffer, req.file.originalname);
+  
+      const httpsAgent = new https.Agent({
+        cert: fs.readFileSync('certs/client.crt'),
+        key: fs.readFileSync('certs/client.key'),
+        ca: fs.readFileSync('certs/ca.crt'),
+        rejectUnauthorized: true
+      });
+  
+      const response = await axios.post('https://127.0.0.1:5000/predict', formData, {
+        headers: formData.getHeaders(),
+        httpsAgent: httpsAgent
+      });
+  
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error calling the IA API:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
