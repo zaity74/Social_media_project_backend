@@ -131,3 +131,49 @@ const addFollowingToUser = async (id, followedUser) => {
         console.error("Error adding following:", error);
     }
 };
+export const unFollowUser = async (req, res) => {
+    try {
+        const userConcerned = req.params.id;
+        const unFollower = req.body.userId;
+
+        console.log(userConcerned);
+        console.log(unFollower);
+        console.log(!mongoose.Types.ObjectId.isValid(userConcerned));
+        console.log(!mongoose.Types.ObjectId.isValid(unFollower));
+        if (!mongoose.Types.ObjectId.isValid(userConcerned) || !mongoose.Types.ObjectId.isValid(unFollower)) {
+            return res.status(400).json({ error: "ID invalide" });
+        }
+
+        const user = await User.findById(userConcerned);
+        if (!user) {
+            return res.status(404).json({ error: "User non trouvé" });
+        }
+
+        if (!user.followers.includes(unFollower) || unFollower === user._id.toString()) {
+            return res.status(400).json({ error: "Vous ne suivez déjà pas cet utilisateur" });
+        }
+
+        user.followers.remove(unFollower);
+        await user.save();
+
+        await unFollowingUser(unFollower, userConcerned);
+        res.status(200).json(user);
+    } catch (err) {
+        console.error("Error following user:", err);
+        res.status(500).json({ error: "Erreur lors du suivi de l'utilisateur" });
+    }
+};
+
+const unFollowingUser = async (id, followedUser) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) return;
+
+        if (user.following.includes(followedUser)) {
+            user.following.remove(followedUser);
+            await user.save();
+        }
+    } catch (error) {
+        console.error("Error adding following:", error);
+    }
+};
