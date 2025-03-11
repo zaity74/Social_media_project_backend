@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import dataBaseConnect from "./database/DatabaseConnect.js";
 //import createUserTest from "./data/UserTest.js";
 // import createPostTest from "./data/PostTest.js";
-import routes from "./routing/UserRouting.js";
+import routes from "./routing/Routing.js";
 import cors from "cors";
 
 const app = express();
