@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import dataBaseConnect from "./database/DatabaseConnect.js";
-import createUserTest from "./data/UserTest.js";
+//import createUserTest from "./data/UserTest.js";
 // import createPostTest from "./data/PostTest.js";
 import routes from "./routing/UserRouting.js";
 import cors from "cors";
@@ -10,7 +10,7 @@ const app = express();
 
 dotenv.config();
 dataBaseConnect()
-createUserTest()
+//createUserTest()
 // createPostTest()
 
 const port = process.env.PORT;
