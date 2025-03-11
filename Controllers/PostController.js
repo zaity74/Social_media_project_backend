@@ -1,5 +1,6 @@
-import { Post, validatePost } from "../models/Post.js";
+import { Post, validatePost, validateUpdatePost } from "../models/Post.js";
 import {User, validateUser} from "../models/User.js";
+import mongoose from "mongoose";
 
 /**
  
@@ -19,24 +20,30 @@ export const getPosts = async (req, res) => {
 
 export const createPost = async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.body.author });
-        if (!user) {
-            return res.status(400).json({ error: "Auteur non trouvé" });
+        const { error } = validatePost(req.body);
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
         }
 
+        const { content, image, author } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(author)) {
+            return res.status(400).json({ error: "ID d'auteur invalide" });
+        }
         const newPost = new Post({
-            content: req.body.content,
-            image: req.body.image || "",
-            author: user._id,
+            content,
+            image: image || "",
+            author,
         });
 
         await newPost.save();
         res.status(201).json(newPost);
     } catch (err) {
-        console.error(err);
+        console.error("Error creating post:", err);
         res.status(500).json({ error: "Erreur lors de la création du post" });
     }
-}
+};
+
 
 export const deletePost = async (req, res) => {
     try {
