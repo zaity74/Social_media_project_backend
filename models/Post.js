@@ -26,6 +26,13 @@ function validatePost(post) {
     });
     return schema.validate(post);
 }
+function validateUpdatePost(post) {
+    const schema = Joi.object({
+        content: Joi.string().max(280).required(),
+        image: Joi.string().optional(),
+    });
+    return schema.validate(post);
+}
 
 const Post = mongoose.model("Post", postSchema);
-export { Post, validatePost };
+export { Post, validatePost, validateUpdatePost };

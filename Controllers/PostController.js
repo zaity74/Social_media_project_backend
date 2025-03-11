@@ -56,7 +56,7 @@ export const deletePost = async (req, res) => {
 export const updatePost = async (req, res) => {
     try {
 
-        const { error, value } = validatePost(req.body);
+        const { error, value } = validateUpdatePost(req.body);
 
         if (error !== undefined) {
             return res.status(400).json({ message: error.details[0].message });
