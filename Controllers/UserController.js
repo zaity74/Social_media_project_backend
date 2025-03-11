@@ -1,5 +1,15 @@
 import {User, validateUser} from "../models/User.js";
 
+export const getUsers = async (req, res) => {
+    try {
+        const user = await User.find();
+        res.status(200).send(user); 
+    } catch (error) {
+        console.error(error); 
+        res.status(500).json({ message: "Une erreur est survenue" });
+    }
+}
+
 export const createUser = async (req, res) => {
     try {
 
