@@ -3,6 +3,7 @@ import FormData from "form-data";
 import axios from "axios";
 import https from "https";
 import fs from "fs";
+import mongoose from "mongoose";
 
 export const getUsers = async (req, res) => {
     try {
@@ -92,6 +93,7 @@ export const deleteUser = async (req, res) => {
 };
 
 export const getPrediction = async (req, res) => {
+    console.log("Start prediction...");
     if (!req.file) {
       return res.status(400).json({ error: 'No image provided' });
     }
@@ -111,10 +113,55 @@ export const getPrediction = async (req, res) => {
         headers: formData.getHeaders(),
         httpsAgent: httpsAgent
       });
-  
+      
       res.json(response.data);
+      console.log("Prediction ended... : ", response.data);
     } catch (error) {
       console.error('Error calling the IA API:', error);
       res.status(500).json({ error: error.message });
     }
   }
+export const followUser = async (req, res) => {
+    try {
+        const userToAdd = req.params.id;
+        const follower = req.body.userId;
+
+        if (!mongoose.Types.ObjectId.isValid(userToAdd) || !mongoose.Types.ObjectId.isValid(follower)) {
+            return res.status(400).json({ error: "ID invalide" });
+        }
+
+        const user = await User.findById(userToAdd);
+        if (!user) {
+            return res.status(404).json({ error: "User non trouvé" });
+        }
+
+
+
+        if (user.followers.includes(follower) || follower === user._id.toString()) {
+            return res.status(400).json({ error: "Vous suivez déjà cet utilisateur" });
+        }
+
+        user.followers.push(follower);
+        await user.save();
+
+        await addFollowingToUser(follower, userToAdd);
+        res.status(200).json(user);
+    } catch (err) {
+        console.error("Error following user:", err);
+        res.status(500).json({ error: "Erreur lors du suivi de l'utilisateur" });
+    }
+};
+
+const addFollowingToUser = async (id, followedUser) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) return;
+
+        if (!user.following.includes(followedUser)) {
+            user.following.push(followedUser);
+            await user.save();
+        }
+    } catch (error) {
+        console.error("Error adding following:", error);
+    }
+};
