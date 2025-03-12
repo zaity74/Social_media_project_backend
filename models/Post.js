@@ -7,7 +7,7 @@ const postSchema = new mongoose.Schema({
     image: { type: String, default: "" },
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    reposts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    referencedPost: { type: mongoose.Schema.Types.ObjectId, ref: "Post" }
 }, { timestamps: true });
 
 // Joi validation
