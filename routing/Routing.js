@@ -4,7 +4,7 @@ import {register, login} from "../Controllers/AuthController.js";
 import {
     addLikeToPost,
     createPost,
-    deletePost, getCountPostByUserId,
+    deletePost, getCountPostByUserId, getPostByUserId,
     getPosts,
     removeLikeToPost,
     updatePost
@@ -28,6 +28,7 @@ router.put("/user/unfollow/:id", unFollowUser);
 router.get("/countpost/:userId", getCountPostByUserId);
 
 router.get("/post", getPosts);
+router.get("/post/:userId", getPostByUserId);
 router.post("/post", createPost);
 router.delete("/post/:id", deletePost);
 router.put("/post/:id", updatePost);
