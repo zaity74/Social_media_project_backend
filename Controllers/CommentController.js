@@ -32,3 +32,20 @@ export const createCommentFromPost = async (req, res) => {
         res.status(500).json({ error: "Erreur lors de l'ajout du commentaire" });
     }
 };
+export const deleteComment = async (req, res) => {
+    try {
+
+        const deletedComment = await Comment.findById(req.params.id);
+        if (!deletedComment) {
+            return res.status(404).json({ message: "Commentaire non trouvé" });
+        }
+
+        await deletedComment.deleteOne();
+        res.status(204).end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Une erreur est survenue lors de la suppression",
+        });
+    }
+};

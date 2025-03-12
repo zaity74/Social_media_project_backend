@@ -9,7 +9,7 @@ import {
     removeLikeToPost,
     updatePost
 } from "../Controllers/PostController.js";
-import {createCommentFromPost} from "../Controllers/CommentController.js";
+import {createCommentFromPost, deleteComment} from "../Controllers/CommentController.js";
 import multer from "multer";
 
 const router = express.Router();
@@ -33,6 +33,7 @@ router.put("/post/like/:id", addLikeToPost);
 router.put("/post/unlike/:id", removeLikeToPost);
 
 router.post("/post/comment", createCommentFromPost);
+router.delete("/delete/comment/:id", deleteComment);
 
 router.post("/predict", upload.single('image'), getPrediction)
 
