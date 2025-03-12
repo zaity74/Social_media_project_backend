@@ -1,5 +1,4 @@
 import { Post, validatePost, validateUpdatePost } from "../models/Post.js";
-import {User, validateUser} from "../models/User.js";
 import mongoose from "mongoose";
 
 /**
