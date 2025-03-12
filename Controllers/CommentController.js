@@ -49,3 +49,21 @@ export const deleteComment = async (req, res) => {
         });
     }
 };
+
+export const getCommentsByPost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({ error: "ID invalide" });
+        }
+
+        const comments = await Comment.find({ post: postId })
+            .populate("author", "username avatar")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(comments);
+    } catch (err) {
+        console.error("Error adding comment to post:", err);
+        res.status(500).json({ error: "Erreur lors de l'ajout du commentaire" });
+    }
+};
