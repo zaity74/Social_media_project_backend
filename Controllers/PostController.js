@@ -1,5 +1,6 @@
 import { Post, validatePost, validateUpdatePost } from "../models/Post.js";
 import mongoose from "mongoose";
+import {createNotification} from "../services/NotificationService.js";
 
 /**
 Controller pour récupérer la liste de tous les posts (tweets).
@@ -127,6 +128,7 @@ export const addLikeToPost = async (req, res) => {
 
         post.likes.push(userId);
         await post.save();
+        await createNotification(userId, "like", postId);
 
         res.status(200).json(post);
     } catch (err) {
