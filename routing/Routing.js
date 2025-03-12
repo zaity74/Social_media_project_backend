@@ -12,6 +12,7 @@ import {
 import {createCommentFromPost, deleteComment, getCommentsByPost} from "../Controllers/CommentController.js";
 import { searchPost } from "../Controllers/SearchController.js";
 import multer from "multer";
+import {getNotificationsByUserId, clearNotifsByUser} from "../Controllers/NotificationController.js";
 
 const router = express.Router();
 const upload = multer();
@@ -34,6 +35,9 @@ router.delete("/post/:id", deletePost);
 router.put("/post/:id", updatePost);
 router.put("/post/like/:id", addLikeToPost);
 router.put("/post/unlike/:id", removeLikeToPost);
+
+router.get("/notification/:userId", getNotificationsByUserId);
+router.delete("/notification/delete/:userId", clearNotifsByUser);
 
 router.get("/search", searchPost);
 

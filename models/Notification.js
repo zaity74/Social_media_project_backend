@@ -5,14 +5,13 @@ import { ObjectId } from "bson";
 const notificationSchema = new mongoose.Schema(
     {
         content: { type: String, required: true, maxlength: 280 },
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // The user who receives the notification
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         type: {
             type: String,
             enum: ["like", "comment", "repost", "follow"],
             required: true
-        }, // Type of notification
-        targetId: { type: mongoose.Schema.Types.ObjectId, required: true }, // The post or user related to the notification
-        seen: { type: Boolean, default: false } // If the user has seen the notification
+        },
+        targetId: { type: mongoose.Schema.Types.ObjectId, required: true }
     },
     { timestamps: true }
 );
@@ -33,8 +32,7 @@ function validateNotification(notification) {
                 return value;
             }
             return helpers.error("any.invalid");
-        }).required(),
-        seen: Joi.boolean().optional()
+        }).required()
     });
 
     return schema.validate(notification);
