@@ -24,15 +24,21 @@ export const createPost = async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
-        const { content, image, author } = req.body;
+        const { content, image, author, referencedPost } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(author)) {
             return res.status(400).json({ error: "ID d'auteur invalide" });
         }
+        let validReferencedPost = null;
+        if (referencedPost && mongoose.Types.ObjectId.isValid(referencedPost)) {
+            validReferencedPost = referencedPost;
+        }
+
         const newPost = new Post({
             content,
             image: image || "",
             author,
+            referencedPost: validReferencedPost,
         });
 
         await newPost.save();
@@ -42,7 +48,6 @@ export const createPost = async (req, res) => {
         res.status(500).json({ error: "Erreur lors de la création du post" });
     }
 };
-
 
 export const deletePost = async (req, res) => {
     try {

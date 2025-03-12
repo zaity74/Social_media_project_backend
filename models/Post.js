@@ -7,22 +7,31 @@ const postSchema = new mongoose.Schema({
     image: { type: String, default: "" },
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    referencedPost: { type: mongoose.Schema.Types.ObjectId, ref: "Post" }
+    referencedPost: { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: null }
 }, { timestamps: true });
 
 // Joi validation
 function validatePost(post) {
     const schema = Joi.object({
-        content: Joi.string().max(280).required(),
+        content: Joi.string().max(280).allow("").optional(),
         author: Joi.string().custom((value, helpers) => {
             if (ObjectId.isValid(value)) {
                 return value;
-            } else {
-                return helpers.error('any.invalid');
             }
+            return helpers.error('any.invalid');
         }).required(),
         image: Joi.string().optional(),
+        referencedPost: Joi.string()
+            .custom((value, helpers) => {
+                if (!value || ObjectId.isValid(value)) {
+                    return value;
+                }
+                return helpers.error('any.invalid');
+            })
+            .allow("", null)
+            .optional(),
     });
+
     return schema.validate(post);
 }
 function validateUpdatePost(post) {

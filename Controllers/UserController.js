@@ -26,10 +26,6 @@ export const createUser = async (req, res) => {
 
         const newUser = new User(req.body);
 
-        // if (req.body.image && newUser) {
-        //     newUser.images = [req.body.image];
-        // }
-
         const confirmation = await newUser.save();
         res.status(201).json(confirmation);
     } catch (error) {
@@ -134,8 +130,6 @@ export const followUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: "User non trouvé" });
         }
-
-
 
         if (user.followers.includes(follower) || follower === user._id.toString()) {
             return res.status(400).json({ error: "Vous suivez déjà cet utilisateur" });
