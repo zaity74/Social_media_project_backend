@@ -4,9 +4,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Inscription d'un utilisateur
+// Inscription
 export const register = async (req, res) => {
-    // Validation des données
     const { error } = validateUser(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
@@ -30,6 +29,7 @@ export const register = async (req, res) => {
     }
 };
 
+// connexion
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
