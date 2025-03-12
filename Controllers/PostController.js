@@ -2,7 +2,6 @@ import { Post, validatePost, validateUpdatePost } from "../models/Post.js";
 import mongoose from "mongoose";
 
 /**
- 
 Controller pour récupérer la liste de tous les posts (tweets).
 Cette fonction interroge la base de données pour obtenir tous les posts
 et renvoie la liste en réponse.*/
@@ -13,6 +12,20 @@ export const getPosts = async (req, res) => {
         res.status(200).send(post); 
     } catch (error) {
         console.error(error); 
+        res.status(500).json({ message: "Une erreur est survenue" });
+    }
+};
+
+export const getCountPostByUserId = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ error: "ID d'utilisateur invalide" });
+        }
+        const postCount = await Post.countDocuments({ author: userId });
+        res.status(200).json({ count: postCount });
+    } catch (error) {
+        console.error("Error getting post count:", error);
         res.status(500).json({ message: "Une erreur est survenue" });
     }
 };
