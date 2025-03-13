@@ -90,11 +90,14 @@ export const deleteUser = async (req, res) => {
 
 export const getPrediction = async (req, res) => {
     console.log("Start prediction...");
-      
+
     // Vérification des fichiers reçus
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: "No image provided" });
     }
+
+    // Récupérer l'ID du post si fourni
+    const postId = req.body.postId || "Aucun postId fourni";
   
     try {
       const formData = new FormData();
@@ -104,7 +107,8 @@ export const getPrediction = async (req, res) => {
         formData.append(`image_${index}`, file.buffer, file.originalname);
       });
   
-      console.log(`Images envoyées : ${req.files.map((f) => f.originalname).join(", ")}`);
+      console.log(`Images envoyées : ${req.files.map(f => f.originalname).join(", ")}`);
+      console.log(`Post ID concerné : ${postId}`);
   
       // Agent HTTPS avec certificats
       const httpsAgent = new https.Agent({
