@@ -31,7 +31,7 @@ function validatePost(post) {
             })
             .allow("", null)
             .optional(),
-        hashtags: Joi.array().items(Joi.string()),
+        hashtags: Joi.array().items(Joi.string()).optional(),
     });
 
     return schema.validate(post);
