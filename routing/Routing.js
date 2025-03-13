@@ -14,7 +14,7 @@ import { searchPost } from "../Controllers/SearchController.js";
 import multer from "multer";
 import {getNotificationsByUserId, clearNotifsByUser} from "../Controllers/NotificationController.js";
 import { getUserLikedPosts, getUserFollowers } from "../Controllers/UserController.js";
-import { getPostsByHashtag } from "../Controllers/PostController.js";
+//import { getPostsByHashtag } from "../Controllers/PostController.js";
 
 
 const router = express.Router();
@@ -55,7 +55,7 @@ router.delete("/delete/comment/:id", deleteComment);
 router.get("/post/comments/:id",getCommentsByPost);
 
 router.post("/", createPost);
-router.get("/hashtag/:tag", getPostsByHashtag);
+//router.get("/hashtag/:tag", getPostsByHashtag);
 
 router.post("/predict", upload.array("images", 10), getPrediction)
 
