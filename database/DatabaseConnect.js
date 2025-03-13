@@ -11,7 +11,6 @@ dotenv.config({ path: envFile });
  */
 const dataBaseConnect = async () => {
     try {
-        console.log(process.env.DB);
         await mongoose.connect(process.env.DB);
         console.log('MongoDB connecté');
     } catch (error) {
