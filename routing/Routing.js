@@ -14,6 +14,7 @@ import { searchPost } from "../Controllers/SearchController.js";
 import multer from "multer";
 import {getNotificationsByUserId, clearNotifsByUser} from "../Controllers/NotificationController.js";
 import { getUserLikedPosts, getUserFollowers } from "../Controllers/UserController.js";
+import { getPostByHashtag } from "../Controllers/PostController.js";
 //import { getPostsByHashtag } from "../Controllers/PostController.js";
 
 
@@ -53,6 +54,7 @@ router.get("/search", searchPost);
 router.post("/post/comment", createCommentFromPost);
 router.delete("/delete/comment/:id", deleteComment);
 router.get("/post/comments/:id",getCommentsByPost);
+router.get("/hashtag/:hashtag", getPostByHashtag);
 
 router.post("/", createPost);
 //router.get("/hashtag/:tag", getPostsByHashtag);

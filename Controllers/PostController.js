@@ -18,6 +18,27 @@ export const getPosts = async (req, res) => {
     }
 };
 
+export const getPostByHashtag = async (req, res) => {
+    try {
+        const { hashtag } = req.params; 
+
+        if (!hashtag.startsWith("#")) {
+            return res.status(400).json({ error: "Le hashtag doit commencer par #" });
+        }
+
+        const posts = await Post.find({ hashtags: hashtag }).populate("author", "username");
+
+        if (posts.length === 0) {
+            return res.status(404).json({ message: "Aucun post trouvé avec ce hashtag" });
+        }
+
+        res.status(200).json(posts);
+    } catch (err) {
+        console.error("Erreur lors de la récupération des posts par hashtag:", err);
+        res.status(500).json({ error: "Erreur lors de la récupération des posts" });
+    }
+};
+
 export const getCountPostByUserId = async (req, res) => {
     try {
         const userId = req.params.userId;
