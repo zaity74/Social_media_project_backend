@@ -1,4 +1,5 @@
 import {User, validateUser} from "../models/User.js";
+import { Post } from "../models/Post.js";
 import FormData from "form-data";
 import axios from "axios";
 import https from "https";
@@ -219,5 +220,43 @@ const unFollowingUser = async (id, followedUser) => {
         }
     } catch (error) {
         console.error("Error adding following:", error);
+    }
+};
+
+export const getUserLikedPosts = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ error: "ID user invalide" });
+        }
+
+        const likedPosts = await Post.find({ likes: userId }).populate("author", "username");
+
+        res.status(200).json(likedPosts);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des posts likés :", error);
+        res.status(500).json({ message: "Une erreur est survenue" });
+    }
+};
+
+export const getUserFollowers = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ error: "ID user invalide" });
+        }
+
+        const user = await User.findById(userId).populate("followers", "username");
+
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
+
+        res.status(200).json(user.followers);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des followers :", error);
+        res.status(500).json({ message: "Une erreur est survenue" });
     }
 };

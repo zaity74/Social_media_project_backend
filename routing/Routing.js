@@ -13,6 +13,7 @@ import {createCommentFromPost, deleteComment, getCommentsByPost} from "../Contro
 import { searchPost } from "../Controllers/SearchController.js";
 import multer from "multer";
 import {getNotificationsByUserId, clearNotifsByUser} from "../Controllers/NotificationController.js";
+import { getUserLikedPosts, getUserFollowers } from "../Controllers/UserController.js";
 
 const router = express.Router();
 const upload = multer({
