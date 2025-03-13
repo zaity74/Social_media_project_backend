@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 
-dotenv.config();
+const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env.local";
+dotenv.config({ path: envFile });
+
 
 /**
  * Fonction permettant la connection à notre base de donnée

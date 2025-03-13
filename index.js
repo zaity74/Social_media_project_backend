@@ -10,8 +10,7 @@ const app = express();
 const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env.local";
 dotenv.config({ path: envFile });
 
-dotenv.config();
-//dataBaseConnect()
+dataBaseConnect()
 //createUserTest()
 // createPostTest()
 
