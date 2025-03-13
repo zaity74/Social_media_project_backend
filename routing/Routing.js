@@ -15,7 +15,10 @@ import multer from "multer";
 import {getNotificationsByUserId, clearNotifsByUser} from "../Controllers/NotificationController.js";
 
 const router = express.Router();
-const upload = multer();
+const upload = multer({
+    storage: multer.memoryStorage(), // Stockage en mémoire (peut être modifié)
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limite de taille des fichiers (5MB)
+  });
 
 router.post("/register", register);
 router.post("/login", login);
@@ -45,7 +48,7 @@ router.post("/post/comment", createCommentFromPost);
 router.delete("/delete/comment/:id", deleteComment);
 router.get("/post/comments/:id",getCommentsByPost);
 
-router.post("/predict", upload.single('image'), getPrediction)
+router.post("/predict", upload.array("images", 10), getPrediction)
 
 
 /**

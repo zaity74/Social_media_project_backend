@@ -90,33 +90,45 @@ export const deleteUser = async (req, res) => {
 
 export const getPrediction = async (req, res) => {
     console.log("Start prediction...");
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image provided' });
+      
+    // Vérification des fichiers reçus
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "No image provided" });
     }
   
     try {
       const formData = new FormData();
-      formData.append('image', req.file.buffer, req.file.originalname);
   
+      // Ajouter chaque image au FormData
+      req.files.forEach((file, index) => {
+        formData.append(`image_${index}`, file.buffer, file.originalname);
+      });
+  
+      console.log(`Images envoyées : ${req.files.map((f) => f.originalname).join(", ")}`);
+  
+      // Agent HTTPS avec certificats
       const httpsAgent = new https.Agent({
-        cert: fs.readFileSync('certs/client.crt'),
-        key: fs.readFileSync('certs/client.key'),
-        ca: fs.readFileSync('certs/ca.crt'),
-        rejectUnauthorized: true
+        cert: fs.readFileSync("certs/client.crt"),
+        key: fs.readFileSync("certs/client.key"),
+        ca: fs.readFileSync("certs/ca.crt"),
+        rejectUnauthorized: true,
       });
   
-      const response = await axios.post('https://127.0.0.1:5000/predict', formData, {
+      // Envoi des images à l'API IA
+      const response = await axios.post("https://127.0.0.1:5000/predict", formData, {
         headers: formData.getHeaders(),
-        httpsAgent: httpsAgent
+        httpsAgent: httpsAgent,
       });
-      
+  
+      console.log("Prediction ended: ", response.data);
       res.json(response.data);
-      console.log("Prediction ended... : ", response.data);
+  
     } catch (error) {
-      console.error('Error calling the IA API:', error);
+      console.error("Error calling the IA API:", error.message);
       res.status(500).json({ error: error.message });
     }
-  }
+  };
+
 export const followUser = async (req, res) => {
     try {
         const userToAdd = req.params.id;
