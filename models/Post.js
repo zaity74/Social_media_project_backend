@@ -7,7 +7,8 @@ const postSchema = new mongoose.Schema({
     image: { type: String, default: "" },
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    referencedPost: { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: null }
+    referencedPost: { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: null },
+    hashtags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Hashtag" }]
 }, { timestamps: true });
 
 // Joi validation
@@ -30,6 +31,7 @@ function validatePost(post) {
             })
             .allow("", null)
             .optional(),
+        hashtags: Joi.array().items(Joi.string()),
     });
 
     return schema.validate(post);

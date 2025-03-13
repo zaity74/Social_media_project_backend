@@ -14,6 +14,8 @@ import { searchPost } from "../Controllers/SearchController.js";
 import multer from "multer";
 import {getNotificationsByUserId, clearNotifsByUser} from "../Controllers/NotificationController.js";
 import { getUserLikedPosts, getUserFollowers } from "../Controllers/UserController.js";
+import { getPostsByHashtag } from "../Controllers/PostController.js";
+
 
 const router = express.Router();
 const upload = multer({
@@ -32,6 +34,9 @@ router.put("/user/follow/:id", followUser);
 router.put("/user/unfollow/:id", unFollowUser);
 router.get("/countpost/:userId", getCountPostByUserId);
 
+router.get("/:id/likedPosts", getUserLikedPosts);
+router.get("/:id/followers", getUserFollowers);
+
 router.get("/post", getPosts);
 router.get("/post/:userId", getPostByUserId);
 router.post("/post", createPost);
@@ -48,6 +53,9 @@ router.get("/search", searchPost);
 router.post("/post/comment", createCommentFromPost);
 router.delete("/delete/comment/:id", deleteComment);
 router.get("/post/comments/:id",getCommentsByPost);
+
+router.post("/", createPost);
+router.get("/hashtag/:tag", getPostsByHashtag);
 
 router.post("/predict", upload.array("images", 10), getPrediction)
 

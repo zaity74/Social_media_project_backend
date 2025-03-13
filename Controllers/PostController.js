@@ -1,6 +1,7 @@
 import { Post, validatePost, validateUpdatePost } from "../models/Post.js";
 import mongoose from "mongoose";
 import {createNotification} from "../services/NotificationService.js";
+import { Hashtag } from "../models/hashtag.js";
 
 /**
 Controller pour récupérer la liste de tous les posts (tweets).
@@ -45,35 +46,52 @@ export const getPostByUserId = async (req, res) => {
     }
 };
 
+export const getPostsByHashtag = async (req, res) => {
+    try {
+        const { tag } = req.params;
+        const hashtag = await Hashtag.findOne({ name: tag });
+
+        if (!hashtag) {
+            return res.status(404).json({ message: "Hashtag non trouvé" });
+        }
+
+        const posts = await Post.find({ hashtags: hashtag._id }).populate("author", "username");
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des posts par hashtag :", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+};
+
 export const createPost = async (req, res) => {
     try {
         const { error } = validatePost(req.body);
-        if (error) {
-            return res.status(400).json({ error: error.details[0].message });
-        }
+        if (error) return res.status(400).json({ message: error.details[0].message });
 
-        const { content, image, author, referencedPost } = req.body;
-
-        if (!mongoose.Types.ObjectId.isValid(author)) {
-            return res.status(400).json({ error: "ID d'auteur invalide" });
-        }
-        let validReferencedPost = null;
-        if (referencedPost && mongoose.Types.ObjectId.isValid(referencedPost)) {
-            validReferencedPost = referencedPost;
+        let hashtags = [];
+        if (req.body.hashtags) {
+            hashtags = await Promise.all(req.body.hashtags.map(async tag => {
+                let hashtag = await Hashtag.findOne({ name: tag });
+                if (!hashtag) {
+                    hashtag = new Hashtag({ name: tag });
+                    await hashtag.save();
+                }
+                return hashtag._id;
+            }));
         }
 
         const newPost = new Post({
-            content,
-            image: image || "",
-            author,
-            referencedPost: validReferencedPost,
+            content: req.body.content,
+            image: req.body.image || "",
+            author: req.user._id,
+            hashtags: hashtags
         });
 
         await newPost.save();
         res.status(201).json(newPost);
     } catch (err) {
-        console.error("Error creating post:", err);
-        res.status(500).json({ error: "Erreur lors de la création du post" });
+        console.error("Erreur lors de la création du post :", err);
+        res.status(500).json({ error: "Erreur interne du serveur" });
     }
 };
 
