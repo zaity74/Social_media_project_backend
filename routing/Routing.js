@@ -15,6 +15,8 @@ import multer from "multer";
 import {getNotificationsByUserId, clearNotifsByUser} from "../Controllers/NotificationController.js";
 import { getUserLikedPosts, getUserFollowers } from "../Controllers/UserController.js";
 import { getPostByHashtag } from "../Controllers/PostController.js";
+import { getUnreadNotificationCount } from "../Controllers/NotificationController.js";
+import { createConversation, getConversations, getMessages,deleteConversation, sendMessage } from "../Controllers/ChatController.js";
 //import { getPostsByHashtag } from "../Controllers/PostController.js";
 
 
@@ -48,6 +50,7 @@ router.put("/post/unlike/:id", removeLikeToPost);
 
 router.get("/notification/:userId", getNotificationsByUserId);
 router.delete("/notification/delete/:userId", clearNotifsByUser);
+router.get('/unread-count/:userId', getUnreadNotificationCount);
 
 router.get("/search", searchPost);
 
@@ -61,6 +64,12 @@ router.post("/", createPost);
 
 router.post("/predict", upload.array("images", 10), getPrediction)
 
+
+router.get("/conversations/:userId", getConversations);
+router.post("/conversations", createConversation);
+router.delete("/conversations/:id", deleteConversation);
+router.post("/send", sendMessage); // POST /messages
+router.get("/:id", getMessages); // GET /messages/:conversationId
 
 /**
  * Le router va nous permettre de faire un lien entre nos URL et nos fonctions ( lien front et back )

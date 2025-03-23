@@ -34,5 +34,15 @@ function validateUser(user) {
     return schema.validate(user);
 }
 
+function validateUserUpdate(user) {
+    const schema = Joi.object({
+        username: Joi.string().min(3).max(30).optional(),
+        bio: Joi.string().max(160).optional(),
+        avatar: Joi.string().optional(),
+    });
+
+    return schema.validate(user);
+}
+
 const User = mongoose.model("User", userSchema);
-export { User, validateUser }
+export { User, validateUser, validateUserUpdate };

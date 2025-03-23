@@ -1,9 +1,10 @@
-import {User, validateUser} from "../models/User.js";
+import {User, validateUser, validateUserUpdate} from "../models/User.js";
 import { Post } from "../models/Post.js";
 import FormData from "form-data";
 import axios from "axios";
 import https from "https";
 import fs from "fs";
+import { Notification } from "../models/Notification.js";
 import mongoose from "mongoose";
 
 export const getUsers = async (req, res) => {
@@ -39,23 +40,30 @@ export const createUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     try {
+        const allowedFields = ["username", "bio", "avatar"];
 
-        const { error, value } = validateUser(req.body);
+        const updateData = Object.keys(req.body)
+            .filter(key => allowedFields.includes(key))
+            .reduce((obj, key) => {
+                obj[key] = req.body[key];
+                return obj;
+            }, {});
 
-        if (error !== undefined) {
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: "Aucune donnée valide à mettre à jour." });
+        }
+
+        // ✅ Utilisation de `validateUserUpdate()` au lieu de `validateUser()`
+        const { error } = validateUserUpdate(updateData);
+        if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
 
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            {
-                "username": req.body.username,
-                "email": req.body.email,
-                "password": req.body.password,
-                "bio": req.body.bio,
-                "avatar": req.body.avatar,
-            },
-            { new : true });
+            updateData,
+            { new: true }
+        );
 
         if (!updatedUser) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
@@ -64,9 +72,7 @@ export const updateUser = async (req, res) => {
         res.status(200).json(updatedUser);
     } catch (error) {
         console.error(error);
-        res.status(500).json({
-            message: "Une erreur est survenue lors de la maj",
-        });
+        res.status(500).json({ message: "Une erreur est survenue lors de la mise à jour" });
     }
 };
 
@@ -136,8 +142,8 @@ export const getPrediction = async (req, res) => {
 
 export const followUser = async (req, res) => {
     try {
-        const userToAdd = req.params.id;
-        const follower = req.body.userId;
+        const userToAdd = req.params.id; // ID de l'utilisateur qu'on veut suivre
+        const follower = req.body.userId; // ID de celui qui suit
 
         if (!mongoose.Types.ObjectId.isValid(userToAdd) || !mongoose.Types.ObjectId.isValid(follower)) {
             return res.status(400).json({ error: "ID invalide" });
@@ -145,24 +151,38 @@ export const followUser = async (req, res) => {
 
         const user = await User.findById(userToAdd);
         if (!user) {
-            return res.status(404).json({ error: "User non trouvé" });
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
         }
 
         if (user.followers.includes(follower) || follower === user._id.toString()) {
             return res.status(400).json({ error: "Vous suivez déjà cet utilisateur" });
         }
 
+        // ➕ Ajouter l'utilisateur dans la liste des followers
         user.followers.push(follower);
         await user.save();
 
+        // ➕ Ajouter dans la liste "following" de celui qui suit
         await addFollowingToUser(follower, userToAdd);
+
+        // ✅ Créer la notification de suivi
+        await Notification.create({
+            content: "Quelqu’un vous suit désormais.",
+            user: follower,            // Celui qui a cliqué sur "Suivre"
+            receiver: userToAdd,       // Celui qui reçoit la notif
+            type: "follow",
+            targetId: userToAdd,       // La cible est le profil de l'utilisateur suivi
+            targetModel: "User"
+        });
+
         res.status(200).json(user);
     } catch (err) {
-        console.error("Error following user:", err);
+        console.error("Erreur lors du suivi de l'utilisateur :", err);
         res.status(500).json({ error: "Erreur lors du suivi de l'utilisateur" });
     }
 };
 
+// Fonction utilitaire : ajoute le "following" dans le bon sens
 const addFollowingToUser = async (id, followedUser) => {
     try {
         const user = await User.findById(id);
@@ -173,7 +193,7 @@ const addFollowingToUser = async (id, followedUser) => {
             await user.save();
         }
     } catch (error) {
-        console.error("Error adding following:", error);
+        console.error("Erreur lors de l'ajout au following :", error);
     }
 };
 export const unFollowUser = async (req, res) => {

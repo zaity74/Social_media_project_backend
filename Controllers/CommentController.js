@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import {Comment, validateComment} from "../models/Comment.js";
 import {Post} from "../models/Post.js";
+import { Notification } from "../models/Notification.js";
+import { createNotification } from "../utils/createNotification.js";
 
 export const createCommentFromPost = async (req, res) => {
     try {
@@ -26,6 +28,19 @@ export const createCommentFromPost = async (req, res) => {
             post: postId
         });
         await comment.save();
+
+        // ✅ Créer la notification correctement
+        if (author !== String(post.author)) {
+            await createNotification({
+                user: author,
+                receiver: post.author,
+                type: "comment",
+                content: "Vous avez un nouveau commentaire sur votre publication.",
+                targetId: post._id,
+                targetModel: "Post"
+            });
+        }
+
         res.status(200).json(comment);
     } catch (err) {
         console.error("Error adding comment to post:", err);
