@@ -11,7 +11,6 @@ const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env.lo
 dotenv.config({ path: envFile });
 const server = http.createServer(app);
 
-
 dataBaseConnect()
 //createUserTest()
 // createPostTest()
@@ -19,7 +18,12 @@ dataBaseConnect()
 // 🔌 Initialisation Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // autoriser ton frontend React
+    origin: (origin, callback) => {
+      if (!origin || origin === "http://localhost:5173") {
+        return callback(null, true);  // Permettre les requêtes depuis le frontend local ou n'importe quelle origine
+      }
+      callback(null, true);  // Accepter toutes les autres origines en production
+    },
     methods: ["GET", "POST"]
   }
 });
@@ -43,16 +47,16 @@ io.on("connection", (socket) => {
   });
 });
 
-const port = process.env.PORT;
-const ip = process.env.IP;
-console.log(port);
+const port = process.env.PORT || 3000; // Utiliser un port dynamique
+const ip = process.env.IP || "0.0.0.0";  // Assurez-vous que l'IP est "0.0.0.0" pour les environnements cloud
+
 app.use(express.json());
 app.use(cors({
     origin: (origin, callback) => {
-      if (!origin) {
-        return callback(null, true); // Permettre les requêtes sans origine (ex: requêtes du même domaine)
+      if (!origin || origin === "http://localhost:5173") {
+        return callback(null, true);  // Permettre les requêtes depuis le frontend local ou n'importe quelle origine
       }
-      callback(null, origin); // Autoriser dynamiquement l'origine
+      callback(null, true);  // Accepter toutes les autres origines en production
     },
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
