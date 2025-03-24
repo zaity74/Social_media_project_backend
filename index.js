@@ -64,21 +64,27 @@ console.log(port); // Assurez-vous que l'IP est "0.0.0.0" pour les environnement
 
 // Configuration des middlewares
 app.use(express.json());
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      "https://socialmedy.netlify.app"  // Ajouter l'origine socialmedy
-    ];
 
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);  // Permettre les requêtes des origines autorisées
+
+const allowedOrigins = [
+  "https://socialmedy.netlify.app"
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Check if the origin is allowed
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    callback(null, true);  // Accepter toutes les autres origines en production
   },
+  methods: 'GET, POST, PUT, DELETE',
+  allowedHeaders: 'Content-Type, Authorization',
   credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: "Origin,X-Requested-With,Content-Type,Accept,Authorization"
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(routes);
 
