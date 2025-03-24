@@ -67,7 +67,9 @@ app.use(express.json());
 
 
 const allowedOrigins = [
-  "https://socialmedy.netlify.app"
+  "http://localhost:5173",    // Frontend local
+  "https://socialmedy.netlify.app",  // Origine de production frontend
+  "https://socialmediayy.netlify.app"  // Ajouter l'origine de ton frontend socialmediayy
 ];
 
 const corsOptions = {
