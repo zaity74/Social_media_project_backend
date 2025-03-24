@@ -10,7 +10,6 @@ import { Server } from "socket.io";
 const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env.local";
 dotenv.config({ path: envFile });
 
-
 // Vérifiez les variables d'environnement (si elles sont correctement chargées)
 console.log("DB Connection String:", process.env.DB); // Correctement accédé ici
 
@@ -26,8 +25,13 @@ dataBaseConnect();
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
-      if (!origin || origin === "http://localhost:5173") {
-        return callback(null, true);  // Permettre les requêtes depuis le frontend local
+      const allowedOrigins = [
+        "http://localhost:5173",    // Frontend local
+        "https://socialmedy.netlify.app"  // Ajouter l'origine socialmedy
+      ];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);  // Permettre les requêtes des origines autorisées
       }
       callback(null, true);  // Accepter toutes les autres origines en production
     },
@@ -62,8 +66,13 @@ console.log(port); // Assurez-vous que l'IP est "0.0.0.0" pour les environnement
 app.use(express.json());
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || origin === "http://localhost:5173") {
-      return callback(null, true);  // Permettre les requêtes depuis le frontend local
+    const allowedOrigins = [
+      "http://localhost:5173",    // Frontend local
+      "https://socialmedy.netlify.app"  // Ajouter l'origine socialmedy
+    ];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);  // Permettre les requêtes des origines autorisées
     }
     callback(null, true);  // Accepter toutes les autres origines en production
   },
