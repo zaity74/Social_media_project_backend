@@ -67,7 +67,6 @@ app.use(express.json());
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      "http://localhost:5173",    // Frontend local
       "https://socialmedy.netlify.app"  // Ajouter l'origine socialmedy
     ];
 
