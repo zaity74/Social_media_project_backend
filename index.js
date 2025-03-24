@@ -1,26 +1,33 @@
 import express from "express";
-import http from "http"; // ✅ À ajouter
+import http from "http"; 
 import dotenv from "dotenv";
 import dataBaseConnect from "./database/DatabaseConnect.js";
 import routes from "./routing/Routing.js";
 import cors from "cors";
 import { Server } from "socket.io";
 
-const app = express();
+// Charger les variables d'environnement
 const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env.local";
 dotenv.config({ path: envFile });
+
+
+// Vérifiez les variables d'environnement (si elles sont correctement chargées)
+console.log("DB Connection String:", process.env.DB); // Correctement accédé ici
+
+// Création du serveur Express et Socket.IO
+const app = express();
 const server = http.createServer(app);
 
-dataBaseConnect()
-//createUserTest()
-// createPostTest()
+dataBaseConnect();
+//createUserTest();
+//createPostTest();
 
-// 🔌 Initialisation Socket.IO
+// Initialisation Socket.IO
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
       if (!origin || origin === "http://localhost:5173") {
-        return callback(null, true);  // Permettre les requêtes depuis le frontend local ou n'importe quelle origine
+        return callback(null, true);  // Permettre les requêtes depuis le frontend local
       }
       callback(null, true);  // Accepter toutes les autres origines en production
     },
@@ -39,7 +46,7 @@ io.on("connection", (socket) => {
 
   socket.on("sendMessage", (data) => {
     const { receiverId, text } = data;
-    io.to(receiverId).emit("receiveMessage", data); // ➤ envoi à la room du receveur
+    io.to(receiverId).emit("receiveMessage", data); // ➤ Envoi à la room du receveur
   });
 
   socket.on("disconnect", () => {
@@ -47,24 +54,27 @@ io.on("connection", (socket) => {
   });
 });
 
-const port = process.env.PORT || 3000; // Utiliser un port dynamique
-const ip = process.env.IP || "0.0.0.0";  // Assurez-vous que l'IP est "0.0.0.0" pour les environnements cloud
+const port = process.env.PORT;
+const ip = "0.0.0.0";
+console.log(port); // Assurez-vous que l'IP est "0.0.0.0" pour les environnements cloud
 
+// Configuration des middlewares
 app.use(express.json());
 app.use(cors({
-    origin: (origin, callback) => {
-      if (!origin || origin === "http://localhost:5173") {
-        return callback(null, true);  // Permettre les requêtes depuis le frontend local ou n'importe quelle origine
-      }
-      callback(null, true);  // Accepter toutes les autres origines en production
-    },
-    credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Origin,X-Requested-With,Content-Type,Accept,Authorization"
-  }));
+  origin: (origin, callback) => {
+    if (!origin || origin === "http://localhost:5173") {
+      return callback(null, true);  // Permettre les requêtes depuis le frontend local
+    }
+    callback(null, true);  // Accepter toutes les autres origines en production
+  },
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Origin,X-Requested-With,Content-Type,Accept,Authorization"
+}));
 
 app.use(routes);
 
+// Démarrer le serveur
 server.listen(port, ip, () => {
   console.log(`🚀 Le serveur est à l'écoute sur ${ip}:${port}`);
 });
